@@ -1,0 +1,5 @@
+{
+	"name" : "Party++",
+	"main" : "mod.js",
+	"table" : "def.db"
+}
