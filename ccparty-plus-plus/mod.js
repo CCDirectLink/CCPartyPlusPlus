@@ -1,10 +1,23 @@
 document.body.addEventListener('modsLoaded', function() {
-	// damageOutput multiplier
-	let damageOutputMultArr = [1,0.8, 0.6, 0.6,0.4, 0.4, 0.2];
-	let getPartyDamageMultiplier = cc.sc.party.rawFunctionNames.getPartyDamageMultiplier;
-	cc.sc.party[getPartyDamageMultiplier] = function() {
-		return damageOutputMultArr[cc.sc.party.getPartyCount()];
+	function generateRange(min, max, count) {
+		let interval = (max - min)/(count - 1);
+		return Array(count).fill(max).map((val, index) => val - index * interval);
 	}
-	// Can add up to 100 party members now
-	sc[cc.sc.party.varNames.MAX_PARTY_MEMBERS] = 100
+	const MAX_MEMBERS = 5;
+	
+	let damageOutputMultArr = generateRange(0.6, 1, MAX_MEMBERS);
+	let getDmgFactor = sc.party.getDmgFactor.bind(sc.party);
+	
+	sc.party.getDmgFactor = function() {
+		
+		const trueDmgFactor = getDmgFactor();
+		const newDmgFactor = damageOutputMultArr[sc.party.getPartySize()];
+		
+		if(trueDmgFactor > newDmgFactor) {
+			return trueDmgFactor;
+		}
+		return newDmgFactor;
+	};
+	
+	sc.PARTY_MAX_MEMBERS = damageOutputMultArr.length;
 });
